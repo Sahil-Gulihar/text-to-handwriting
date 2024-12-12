@@ -4,7 +4,7 @@ import GoogleFontsCanvas from "./components/textHand";
 export default function Home() {
   return (
     <>
-    <GoogleFontsCanvas />
+      <GoogleFontsCanvas text="Your custom text here" fontSize={24} />
     </>
   );
 }
