@@ -8,9 +8,14 @@ const qeTonyFlores = localFont({
   display: "swap",
 });
 
-const TablePage = ({ pageNumber, lines, startIndex, isActive, onFocus }) => {
+const TablePage = ({ pageNumber, lines, startIndex, isActive, onFocus, onTextChange, allText }) => {
   const inputRef = useRef(null);
   const rows = Array(12).fill(null);
+
+  const handleInput = (e) => {
+    const newText = e.target.value;
+    onTextChange(newText);
+  };
 
   return (
     <div 
@@ -27,6 +32,8 @@ const TablePage = ({ pageNumber, lines, startIndex, isActive, onFocus }) => {
       {isActive && (
         <textarea
           ref={inputRef}
+          value={allText}
+          onChange={handleInput}
           className={`${qeTonyFlores.className} absolute top-24 left-4 w-[460px] h-[600px] bg-transparent text-2xl leading-[49px] resize-none border-none focus:outline-none focus:ring-0 z-20`}
           autoFocus
         />
@@ -96,29 +103,26 @@ const TablePage = ({ pageNumber, lines, startIndex, isActive, onFocus }) => {
 };
 
 const InteractiveTextDiv = () => {
-  const [text, setText] = useState("");
-  const [pages, setPages] = useState([]);
+  const [text, setText] = useState("26");
   const [activePage, setActivePage] = useState(1);
 
-  useEffect(() => {
-    const lines = text.split("\n");
-    const linesPerPage = 12;
-    const totalPages = Math.max(1, Math.ceil(lines.length / linesPerPage));
-    
-    const newPages = [];
-    for (let i = 0; i < totalPages; i++) {
-      newPages.push({
-        pageNumber: i + 1,
-        startIndex: i * linesPerPage,
-        lines: lines
-      });
-    }
-    setPages(newPages);
-  }, [text]);
+  const handleTextChange = (newText) => {
+    setText(newText);
+  };
+
+  // Calculate pages based on line count
+  const lines = text.split("\n");
+  const linesPerPage = 12;
+  const totalPages = Math.max(1, Math.ceil(lines.length / linesPerPage));
+  
+  const pages = Array.from({ length: totalPages }, (_, i) => ({
+    pageNumber: i + 1,
+    startIndex: i * linesPerPage,
+    lines: lines
+  }));
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {/* Table Section */}
       <div className="flex flex-col items-center">
         {pages.map((page) => (
           <TablePage
@@ -128,6 +132,8 @@ const InteractiveTextDiv = () => {
             startIndex={page.startIndex}
             isActive={page.pageNumber === activePage}
             onFocus={setActivePage}
+            onTextChange={handleTextChange}
+            allText={text}
           />
         ))}
       </div>
